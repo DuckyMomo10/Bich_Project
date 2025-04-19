@@ -42,14 +42,6 @@ const HeaderComponent = ({ product }) => {
     setShowSearch(false);
   };
 
-  const showLiked = () => {
-    setOpen(true);
-  };
-
-  const closeLiked = () => {
-    setOpen(false);
-  };
-
   return (
     <Header
       className="nav-header relative"

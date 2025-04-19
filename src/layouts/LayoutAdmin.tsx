@@ -58,10 +58,10 @@ const LayoutAdmin = () => {
             <NavLink to="/admin/product">Product</NavLink>
           </Menu.Item>
           <Menu.Item key="5">
-            <NavLink to="/login">Login</NavLink>
+            <NavLink to="/admin/login">Login</NavLink>
           </Menu.Item>
           <Menu.Item key="6">
-            <NavLink to="/logout">Logout</NavLink>
+            <NavLink to="/admin/logout">Logout</NavLink>
           </Menu.Item>
         </Menu>
       </Header>

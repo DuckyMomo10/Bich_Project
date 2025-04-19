@@ -1,9 +1,34 @@
+/* Import Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Pacifico&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 @import "tailwindcss";
 
+/* Font Face Definitions */
 @font-face {
   font-family: 'Gill Sans';
   src: url('./assets/gillsansnova_book.ttf');
+}
+
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: 'Gill Sans', sans-serif !important;
+}
+
+body::-webkit-scrollbar {
+  width: 5px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+body::-webkit-scrollbar-thumb {
+  background: #a2a1a1;
+  border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #a2a1a1;
 }
 
 #root {
@@ -11,68 +36,16 @@
   text-align: center;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  font-family: 'Gill Sans', sans-serif !important;
-}
-
+/* Font Family Overrides */
 .noto-card *,
-.noto-card, .heading-popular, .cart-container *, .cart-container {
+.noto-card, 
+.heading-popular, 
+.cart-container *, 
+.cart-container {
   font-family: 'Noto Sans JP', sans-serif !important;
 }
 
-.cart-container::-webkit-scrollbar {
-  display: none;
-}
-
-.slide-search {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 0;
-  overflow: hidden;
-  background: white;
-  transition: height 0.3s ease;
-  z-index: 50;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.slide-search.active {
-  height: 130px; /* hoặc chiều cao mong muốn */
-}
-
-
-
-.nav-link {
-  color: #121212bf;
-  text-decoration: none;
-  padding-bottom: 0.5px;
-  transition: all 0.3s ease;
-  border-bottom: 0.5px solid transparent;
-}
-
-.nav-link:hover {
-  border-bottom: 0.5px solid grey;
-  color: black;
-}
-
-.nav-link.active {
-  border-bottom: 0.5px solid grey;
-}
-
-/* CSS custom */
-.custom-search-input input {
-  height: 60px;
-  font-size: 18px;
-}
-
-
-/* App.css hoặc style.css */
-
+/* Navigation Styles */
 .nav-header {
   display: flex;
   align-items: center;
@@ -97,11 +70,89 @@
   cursor: pointer;
 }
 
+.nav-link {
+  color: #121212bf;
+  text-decoration: none;
+  padding-bottom: 0.5px;
+  transition: all 0.3s ease;
+  border-bottom: 0.5px solid transparent;
+}
+
+.nav-link:hover {
+  border-bottom: 0.5px solid grey;
+  color: black;
+}
+
+.nav-link.active {
+  border-bottom: 0.5px solid grey;
+}
+
+/* Search Component Styles */
+.slide-search {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  overflow: hidden;
+  background: white;
+  transition: height 0.3s ease;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide-search.active {
+  height: 130px;
+}
+
+/* Floating Input Styles */
+.floating-input {
+  position: relative;
+}
+
+.floating-input .ant-input {
+  padding: 8px 11px;
+  height: 40px;
+}
+
+.floating-label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  color: rgb(66, 66, 66);
+  background: transparent;
+  z-index: 100000;
+}
+
+.input-wrapper.active .floating-label {
+  top: 8px;
+  left: 8px;
+  font-size: 12px;
+  color: gray;
+  padding: 0 4px;
+}
+
+/* Custom Components */
+.custom-search-input input {
+  height: 60px;
+  font-size: 18px;
+}
+
 .no-hover-effect {
   background-color: transparent !important;
 }
 
+/* Utility Classes */
+.cart-container::-webkit-scrollbar {
+  display: none;
+}
 
+/* Media Queries */
 @media (max-width: 768px) {
   .nav-header {
     flex-direction: column;
@@ -119,5 +170,4 @@
     flex-direction: column;
     gap: 10px;
   }
-} 
-
+}

@@ -1,12 +1,14 @@
-import React from 'react'
+import React from "react";
 import { Button, Card, Form, Input, Typography } from "antd";
 const { Title, Text } = Typography;
 
-const Register = () => {
+import { Link } from "react-router";
+
+const Login = () => {
   const [form] = Form.useForm();
   return (
     <div
-    style={{
+      style={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -14,50 +16,47 @@ const Register = () => {
         background: "#f4f4f4",
       }}
     >
-      <Card title={<Title level={3} style={{ textAlign: "center" }}>Register</Title>}
+      <Card
+        title={
+          <Title level={3} style={{ textAlign: "center" }}>
+            Login
+          </Title>
+        }
         style={{
           width: 400,
           padding: "20px",
           borderRadius: "10px",
           boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
           background: "#fff",
-        }}>
+        }}
+      >
         <Form
-          name="basic"
-          layout="vertical"
           form={form}
+          name="login-form"
+          layout="vertical"
           // onFinish={handleSubmit}
           autoComplete="off"
         >
           <Form.Item
-            label="Username"
-            name="username"
-            rules={[
-              { required: true, message: "Please input username!" },
-              { min: 3, message: "Username must be at least 3 characters!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: "Please input your email!" },
-                { type: "email", message: "Please enter your email"}
+            rules={[
+              { required: true, message: "Please input your email!" },
+              { type: "email", message: "Please enter a valid email!" },
             ]}
           >
-            <Input />
+            <Input placeholder="Enter your email" />
           </Form.Item>
 
           <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: "Please input your password!" },
-                { min: 5, message: "Password must be at least 5 characters!" },
+            rules={[
+              { required: true, message: "Please input your password!" },
+              { min: 5, message: "Password must be at least 5 characters!" },
             ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Enter your password" />
           </Form.Item>
 
           <Form.Item>
@@ -67,19 +66,23 @@ const Register = () => {
               block
               style={{ height: "40px", fontSize: "16px", fontWeight: "bold" }}
             >
-              Register
+              Login
             </Button>
           </Form.Item>
+
           <div style={{ textAlign: "center", marginTop: "10px" }}>
-            <Text>Already have an account? </Text>
-            <a href="/login" style={{ color: "#1890ff", fontWeight: "bold" }}>
-              Login here
-            </a>
+            <Text>Don't have an account? </Text>
+            <Link
+              to="/admin/register"
+              style={{ color: "#1890ff", fontWeight: "bold" }}
+            >
+              Register here
+            </Link>
           </div>
         </Form>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default Register
+export default Login;
