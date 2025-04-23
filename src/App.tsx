@@ -17,7 +17,7 @@ import Checkout from "./pages/User/Checkout";
 import About from "./pages/User/About";
 import Contact from "./pages/User/Contact";
 import Register from "./pages/User/Register";
-import Login from "./pages/User/login";
+import Login from "./pages/User/Login";
 
 function App() {
   return (

@@ -1,18 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Select, Divider, message } from "antd";
 import HeaderComponent from "../../components/Header/HeaderComponent";
 import FooterComponent from "../../components/Footer/FooterComponent";
 import { useCart } from "../../context/CartContext";
 import FormatCurrent from "../../services/FormatCurrent";
-const delivery = 250000;
+import { useLocation } from "react-router-dom";
 
 const Checkout = () => {
   const [form] = Form.useForm();
   const { cartItems } = useCart();
+  const location = useLocation();
+  const [checkoutItems, setCheckoutItems] = useState<any[]>([]);
+  const delivery = 25000;
 
-  const delivery = 25000
+  useEffect(() => {
+    // Parse URL parameters for direct purchase
+    const params = new URLSearchParams(location.search);
+    const productParam = params.get('product');
+    
+    if (productParam) {
+      try {
+        const directProduct = JSON.parse(decodeURIComponent(productParam));
+        setCheckoutItems([{
+          id: directProduct.id,
+          name: directProduct.name,
+          price: directProduct.price,
+          quantity: directProduct.quantity,
+          color: directProduct.color
+        }]);
+      } catch (error) {
+        console.error('Error parsing product data:', error);
+        setCheckoutItems(cartItems);
+      }
+    } else {
+      setCheckoutItems(cartItems);
+    }
+  }, [location.search, cartItems]);
 
-  const totalProductPrice = cartItems.reduce(
+  const totalProductPrice = checkoutItems.reduce(
     (total, item) => total + item.quantity * item.price,
     0
   );
@@ -21,7 +46,7 @@ const Checkout = () => {
   const handleFinish = (values: any) => {
     const orderData = {
       ...values,
-      products: cartItems,
+      products: checkoutItems,
       total,
     }
     console.log(orderData);
@@ -96,10 +121,10 @@ const Checkout = () => {
               Tóm tắt đơn hàng
             </h2>
             <div className="text-[#3e3224] space-y-3">
-              {cartItems.map((item) => (
+              {checkoutItems.map((item) => (
                 <div key={item.id} className="flex justify-between">
                   <span>
-                    {item.name} ({item.quantity} x{" "}
+                    {item.name} {item.color ? `(${item.color})` : ''} ({item.quantity} x{" "}
                     {FormatCurrent({ price: item.price })})
                   </span>
                   <span>
@@ -110,14 +135,14 @@ const Checkout = () => {
 
               <div className="flex justify-between pt-3">
                 <span>Phí vận chuyển</span>
-                <span><FormatCurrent price={ delivery } /></span>
+                <span><FormatCurrent price={delivery} /></span>
               </div>
 
               <Divider />
 
               <div className="flex justify-between font-semibold text-lg">
                 <span>Tổng cộng</span>
-                <span>{FormatCurrent({ price: total })}</span>
+                <span><FormatCurrent price={total} /></span>
               </div>
             </div>
           </div>
@@ -128,4 +153,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout;
+export default Checkout; 

@@ -1,10 +1,10 @@
 import { Card, Typography, message } from "antd";
 import React, { useState } from "react";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
-import imgProduct from "../assets/product.jpg"; // ảnh mặc định
+import imgProduct from "../assets/product.jpg";
 import FormatCurrent from "../services/FormatCurrent";
 import { ProductType } from "../types/Product";
-import { Link } from "react-router-dom"; // Sửa lại import Link
+import { Link } from "react-router-dom";
 import { useFavourite } from "../context/FavouriteContext";
 const { Title } = Typography;
 
@@ -16,13 +16,13 @@ const colors = ["#ad7a2b", "#775621", "#5e4318"];
 
 const CardProduct = ({ product }: { product: ExtendedProduct }) => {
   const [like, setLike] = useState(false);
-  const { favourites, toggleFavourite, isFavourite } = useFavourite(); // Sửa lại cách lấy context
+  const { favourites, toggleFavourite, isFavourite } = useFavourite();
 
   const handleLike = () => {
-  setLike(!like);
-    toggleFavourite(product); // Gọi toggleFavourite khi nhấn vào trái tim
+    setLike(!like);
+    toggleFavourite(product);
     message.success(
-      !like ? "Đã xóa khỏi yêu thích!" : "Đã thêm vào yêu thích!"
+      !like ? "Đã thêm vào yêu thích!" : "Đã xóa khỏi yêu thích!"
     );
   };
 
@@ -30,10 +30,9 @@ const CardProduct = ({ product }: { product: ExtendedProduct }) => {
     <div className="noto-card">
       <Card
         style={{ width: 260, position: "relative", border: "none" }}
+        bodyStyle={{paddingLeft: 5, paddingTop: 10}}
         cover={
-          <div
-            style={{ position: "relative", overflow: "hidden", height: 280 }}
-          >
+          <div style={{ position: "relative", overflow: "hidden", height: 280 }}>
             <Link to={`/product/${product.id}`}>
               <img
                 alt="Product"
@@ -70,43 +69,43 @@ const CardProduct = ({ product }: { product: ExtendedProduct }) => {
           </div>
         }
       >
-        <Title
-          level={5}
-          style={{ marginBottom: 0, display: "flex", fontWeight: "normal" }}
-        >
-          {product.name}
-        </Title>
-        <div className="price flex items-center gap-2" style={{ marginTop: 8 }}>
-          <span
-            className="line-through text-gray-400 text-[12px]"
-            style={{ marginTop: 3 }}
-          >
-            <FormatCurrent price={product.oldPrice || product.price} />
-          </span>
-          <span className="font-semibold text-red-500 text-base">
-            <FormatCurrent price={product.price} />
-          </span>
-        </div>
+        <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }} className="a">
+          <Title level={5} style={{ marginBottom: 0, fontWeight: "normal", textAlign:'left' }}>
+            {product.name}
+          </Title>
+          <div className="price flex items-center gap-2" style={{ marginTop: 8 }}>
+            <span
+              className="line-through text-gray-400 text-[12px]"
+              style={{ marginTop: 3 }}
+            >
+              <FormatCurrent price={product.oldPrice || product.price} />
+            </span>
+            <span className="font-semibold text-red-500 text-base">
+              <FormatCurrent price={product.price} />
+            </span>
+          </div>
 
-        <div
-          style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}
-        >
-          {colors.map((color, index) => (
             <div
-              key={index}
-              style={{
-                width: 18,
-                height: 18,
-                borderRadius: "50%",
-                backgroundColor: color,
-                border: "1px solid #ccc",
-              }}
-            />
-          ))}
-        </div>
+              style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "start" }}
+            >
+              {colors.map((color, index) => (
+                <div
+                  key={index}
+                  title={color}
+                  style={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: "50%",
+                    border: "1px solid #ccc",
+                    backgroundColor: color,
+                  }}
+                />
+              ))}
+            </div>
+        </Link>
       </Card>
     </div>
   );
 };
 
-export default CardProduct;
+export default CardProduct; 

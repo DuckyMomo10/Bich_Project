@@ -6,6 +6,7 @@ import CardProduct from "../../components/CardProduct";
 import { ProductType } from "../../types/Product";
 import FooterComponent from "../../components/Footer/FooterComponent";
 import Instagram from "../../assets/instagram.png";
+import { mockProducts } from "../../types/mockProduct";
 
 const Home = () => {
   const products = [
@@ -105,13 +106,14 @@ const Home = () => {
         </h1>
         <div
           style={{
-            display: "flex",
-            gap: 23,
-            flexWrap: "wrap",
-            justifyContent: "center",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            maxWidth: "1120px",
+            margin: "0 auto",
+            padding: "0 12px",
           }}
         >
-          {products.map((p) => (
+          {mockProducts.map((p) => (
             <CardProduct key={p.id} product={p} />
           ))}
         </div>
