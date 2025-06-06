@@ -30,7 +30,7 @@ const LayoutAdmin = () => {
           display: "flex",
           alignItems: "center",
           width: "100%",
-          background: "#ac6b09", // ✅ Đổi màu header
+          background: "#000957", // ✅ Đổi màu header
         }}
       >
         <div className="logo" style={{ display: "flex", flex: 1, alignItems: "center" }}>
@@ -44,7 +44,7 @@ const LayoutAdmin = () => {
           style={{
             flex: 1,
             justifyContent: "flex-end",
-            background: "#ac6b09", // ✅ Đổi màu menu header
+            background: "#000957", // ✅ Đổi màu menu header
             borderBottom: "none",
           }}
         >
@@ -68,13 +68,13 @@ const LayoutAdmin = () => {
 
       <Layout>
         {/* Sidebar */}
-        <Sider style={{ background: "#ac6b09" }}> {/* ✅ Đổi màu sidebar */}
+        <Sider style={{ background: "#000957" }}> {/* ✅ Đổi màu sidebar */}
           <Menu
             theme="dark"
             mode="inline"
             selectedKeys={[selectedKey]}
             onSelect={handleMenuSelect}
-            style={{ background: "#ac6b09" }} // ✅ Màu menu bên trái
+            style={{ background: "#000957" }} // ✅ Màu menu bên trái
             items={[
               {
                 key: "1",
