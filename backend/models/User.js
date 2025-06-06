@@ -31,10 +31,22 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "admin"],
     default: "user",
   },
-  wishlist: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
-  }],
+  instagram: {
+    type: String,
+    default: '',
+  },
+  avatar: {
+    type: String,
+    default: '',
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  lastLogin: {
+    type: Date,
+    default: null,
+  },
   resetToken: {
     type: String,
     default: null,
@@ -43,6 +55,24 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Virtual field for full profile URL
+userSchema.virtual('profileUrl').get(function() {
+  return `/api/users/${this._id}`;
+});
+
+// Method to get public profile (without sensitive data)
+userSchema.methods.getPublicProfile = function() {
+  const userObject = this.toObject();
+  delete userObject.password;
+  delete userObject.resetToken;
+  delete userObject.resetTokenExpiry;
+  return userObject;
+};
 
 export default mongoose.model("User", userSchema);

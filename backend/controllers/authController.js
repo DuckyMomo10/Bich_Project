@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
-import User from "../models/user.js";
+import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -17,7 +18,7 @@ const generateToken = (user) => {
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, adminInviteToken } = req.body;
+    const { name, email, password, adminInviteToken, instagram, phoneNumber, address } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -39,6 +40,10 @@ export const register = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      instagram,
+      phoneNumber,
+      address,
+      lastLogin: new Date(),
     });
 
     const token = generateToken(user);
@@ -54,6 +59,8 @@ export const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        instagram: user.instagram,
+        avatar: user.avatar,
         token,
       });
   } catch (error) {
@@ -71,10 +78,18 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    if (!user.isActive) {
+      return res.status(401).json({ message: "Account is deactivated" });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
 
     const token = generateToken(user);
     res
@@ -88,6 +103,8 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        instagram: user.instagram,
+        avatar: user.avatar,
         token,
       });
   } catch (error) {
@@ -102,14 +119,14 @@ export const getUserProfile = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await User.findById(req.user._id).select("-password");
-    console.log(user);
-
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(user);
+    // Use the getPublicProfile method we added to the model
+    const publicProfile = user.getPublicProfile();
+    res.status(200).json(publicProfile);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -124,15 +141,18 @@ export const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Cập nhật các trường nếu có trong req.body
+    // Cập nhật các trường cơ bản
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
     user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
     user.address = req.body.address || user.address;
+    user.instagram = req.body.instagram || user.instagram;
+    user.avatar = req.body.avatar || user.avatar;
 
-    // Chỉ admin mới được cập nhật role
-    if (req.user.role === 'admin' && req.body.role) {
-      user.role = req.body.role;
+    // Chỉ admin mới được cập nhật role và isActive
+    if (req.user.role === 'admin') {
+      if (req.body.role) user.role = req.body.role;
+      if (req.body.isActive !== undefined) user.isActive = req.body.isActive;
     }
 
     // Cập nhật password nếu có
@@ -142,16 +162,11 @@ export const updateUserProfile = async (req, res) => {
     }
 
     const updatedUser = await user.save();
+    const publicProfile = updatedUser.getPublicProfile();
 
     res.json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      phoneNumber: updatedUser.phoneNumber,
-      address: updatedUser.address,
-      role: updatedUser.role,
-      isAdmin: updatedUser.role === 'admin',
-      token: generateToken(updatedUser._id),
+      ...publicProfile,
+      token: generateToken(updatedUser),
     });
   } catch (error) {
     console.error(error);
@@ -159,30 +174,57 @@ export const updateUserProfile = async (req, res) => {
   }
 };
 
-
-const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    if(!email) return res.status(400).json({message: "Please provide your email"})
+    if (!email) return res.status(400).json({ message: "Please provide your email" });
 
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
 
     await user.save();
 
-    
+    // TODO: Send email with reset token
+    res.status(200).json({ message: "Password reset token sent to email" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: "Token and new password are required" });
+    }
+
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired reset token" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    user.resetToken = null;
+    user.resetTokenExpiry = null;
+
+    await user.save();
+    res.status(200).json({ message: "Password has been reset successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 

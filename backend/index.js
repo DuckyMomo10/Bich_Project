@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auths.js";
 import productRouter from "./routes/products.js";
+import userRouter from "./routes/users.js";
 
 dotenv.config();
 
@@ -33,21 +34,23 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use("/uploads", express.static("uploads"));
 
-
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-app.use('/api/auth', authRouter)
-app.use('/api/product', productRouter); 
-// Middleware
+// Routes
+app.use('/api/auth', authRouter);
+app.use('/api/products', productRouter);
+app.use('/api/users', userRouter);
+
+// Error handling middleware
 app.use((error, req, res, next) => {
-    console.log(error.stack);
-    res.status(500).json({ message: "Something went wrong" });
-})
+  console.log(error.stack);
+  res.status(500).json({ message: "Something went wrong" });
+});
 
 connect().then(() => {
-    app.listen(port, () => {
-        console.log(`Server is running on port ${port}`);
-    })
-})
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+});

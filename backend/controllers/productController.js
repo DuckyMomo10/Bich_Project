@@ -199,7 +199,7 @@ export const updateProduct = async (req, res) => {
       new: true,
     });
 
-    res.status(200).json({ message: `Product ${name} updated successfully` });
+    res.status(200).json({ message: `Product updated successfully` });
   } catch (error) {
     // Clean up any newly uploaded images if there's an error
     if (req.files) {
