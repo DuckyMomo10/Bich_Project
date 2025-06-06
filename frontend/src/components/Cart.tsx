@@ -25,7 +25,7 @@ const Cart = () => {
   const [selectedItem, setSelectedItem] = useState<string[]>([]);
 
   // Tổng tiền được tính (bao gồm phí ship)
-  const [total, setTotal] = useState(0);
+  // const [total, setTotal] = useState(0);
 
   // Phí vận chuyển (giả lập)
 
@@ -64,9 +64,9 @@ const Cart = () => {
   }, 0);
 
   // Cập nhật tổng cộng mỗi khi `totalSelectedPrice` hoặc `delivery` thay đổi
-  useEffect(() => {
-    setTotal(totalSelectedPrice);
-  }, [totalSelectedPrice]);
+  // useEffect(() => {
+  //   setTotal(totalSelectedPrice);
+  // }, [totalSelectedPrice]);
 
   // Giả lập dữ liệu giỏ hàng ban đầu
   useEffect(() => {

@@ -1,4 +1,3 @@
-import React from "react";
 import { Form, Button, Layout, Typography } from "antd";
 import FloatingLabelInput from "../../shared/InputFloating";
 import HeaderComponent from "../../components/Header/HeaderComponent";
@@ -6,10 +5,16 @@ import FooterComponent from "../../components/Footer/FooterComponent";
 import { Link } from "react-router";
 const { Title, Text } = Typography;
 
+interface RegisterFormValues {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const Register = () => {
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
+  const onFinish = (values: RegisterFormValues) => {
     console.log("Form values:", values);
   };
 
@@ -25,6 +30,7 @@ const Register = () => {
               className="name"
               label="Name"
               required
+              type="text"
               rules={[
                 {
                   type: "email",
@@ -37,6 +43,7 @@ const Register = () => {
               className="email"
               label="Email"
               required
+              type="text"
               rules={[
                 {
                   type: "email",

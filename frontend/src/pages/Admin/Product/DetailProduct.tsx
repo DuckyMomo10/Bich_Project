@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, Descriptions, Button, Row, Col, Typography, Space } from 'antd';
 import { Link } from 'react-router-dom'; // Chú ý: sử dụng 'react-router-dom' thay vì 'react-router'
 import ProductImage from "../../../assets/product.jpg";

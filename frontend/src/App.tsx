@@ -6,7 +6,6 @@ import Dashboard from "./pages/Admin/Dashboard";
 import EditProduct from "./pages/Admin/Product/EditProduct";
 import Home from "./pages/User/Home";
 import LayoutAdmin from "./layouts/LayoutAdmin";
-import PrivateRoute from "./routes/PrivateRoute"; // Import PrivateRoute để bảo vệ các route admin
 import Product from "./pages/Admin/Product/Product";
 import User from "./pages/Admin/User/User";
 import DetailUser from "./pages/Admin/User/DetailUser";

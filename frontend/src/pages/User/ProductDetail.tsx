@@ -1,17 +1,15 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import HeaderComponent from "../../components/Header/HeaderComponent";
 import FooterComponent from "../../components/Footer/FooterComponent";
-import { Button, Card, Carousel, Col, Image, Input, Layout, Row } from "antd";
+import { Button, Carousel, Col, Image, Input, Layout, Row } from "antd";
 import {
   CaretLeftFilled,
   CaretRightFilled,
   EyeOutlined,
-  UpOutlined,
 } from "@ant-design/icons";
 import imgProduct from "../../assets/product.jpg";
 import FormatCurrent from "../../services/FormatCurrent";
 import type { CarouselRef } from "antd/es/carousel";
-import CardProduct from "../../components/CardProduct";
 import RelateProduct from "../../components/RelateProduct";
 import { useParams } from "react-router-dom";
 import { mockProducts } from "../../types/mockProduct";
@@ -45,7 +43,6 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselRef = useRef<CarouselRef>(null);
-  const [activeToggle, setActiveToggle] = useState(null);
   const [showDescription, setShowDescription] = useState(false);
 
   useEffect(() => {

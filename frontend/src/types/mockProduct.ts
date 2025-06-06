@@ -15,7 +15,8 @@ export const mockProducts = [
         material: "Gỗ công nghiệp",
         dimensions: "120cm x 60cm x 75cm",
         warranty: "12 tháng",
-      }
+      },
+      favourites: false,
     },
     {
       id: "sp02", 
@@ -32,7 +33,8 @@ export const mockProducts = [
         material: "Vải lưới cao cấp",
         dimensions: "65cm x 65cm x 120cm",
         warranty: "24 tháng",
-      }
+      },
+      favourites: false,
     },
     {
       id: "sp03",
@@ -49,7 +51,8 @@ export const mockProducts = [
         material: "Gỗ MDF",
         dimensions: "180cm x 90cm x 30cm",
         warranty: "12 tháng",
-      }
+      },
+      favourites: false,
     },
     {
       id: "sp04",
@@ -66,7 +69,8 @@ export const mockProducts = [
         material: "Gỗ công nghiệp",
         dimensions: "60cm x 120cm x 75cm",
         warranty: "12 tháng",
-      }
+      },
+      favourites: false,
     },
     {
       id: "sp05",
@@ -83,7 +87,8 @@ export const mockProducts = [
         material: "Gỗ MDF",
         dimensions: "180cm x 90cm x 30cm",
         warranty: "12 tháng",
-      }
+      },
+      favourites: false,
     },
     {
       id: "sp06",
@@ -100,6 +105,7 @@ export const mockProducts = [
         material: "Gỗ công nghiệp",
         dimensions: "120cm x 200cm x 30cm",
         warranty: "12 tháng",
-      }
+      },
+      favourites: false,
     }
   ]; 

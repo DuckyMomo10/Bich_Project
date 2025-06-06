@@ -1,5 +1,5 @@
 import { Card, Typography } from "antd";
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import imgProduct from "../assets/product.jpg"; // ảnh mặc định
 import FormatCurrent from "../services/FormatCurrent";
 import { ProductType } from "../types/Product";

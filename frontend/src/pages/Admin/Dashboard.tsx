@@ -1,5 +1,4 @@
-import React from 'react';
-import { Card, Col, Row, Statistic, Typography, Table, Tag, Button } from 'antd';
+import { Card, Col, Row, Statistic, Typography, Table, Tag } from 'antd';
 import {
   ShoppingCartOutlined,
   DollarOutlined,

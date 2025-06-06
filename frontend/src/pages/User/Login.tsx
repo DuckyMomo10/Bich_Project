@@ -1,4 +1,3 @@
-import React from "react";
 import { Form, Button, Layout, Typography } from "antd";
 import FloatingLabelInput from "../../shared/InputFloating";
 import HeaderComponent from "../../components/Header/HeaderComponent";
@@ -6,10 +5,15 @@ import FooterComponent from "../../components/Footer/FooterComponent";
 import { Link } from "react-router";
 const { Title, Text } = Typography;
 
+interface LoginFormValues {
+  email: string;
+  password: string;
+}
+
 const Login = () => {
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
+  const onFinish = (values: LoginFormValues) => {
     console.log("Form values:", values);
   };
 

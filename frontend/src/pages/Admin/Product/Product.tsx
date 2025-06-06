@@ -50,10 +50,10 @@ const Product = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button variant="solid" color="primary">
-            <NavLink to={`/admin/detail-product/${record.key}`}>Detail</NavLink>
+            <NavLink to={`/admin/detail-product/${record.id}`}>Detail</NavLink>
           </Button>
           <Button variant="solid" color="gold">
-            <NavLink to={`/admin/edit-product/${record.key}`}>Edit</NavLink>
+            <NavLink to={`/admin/edit-product/${record.id}`}>Edit</NavLink>
           </Button>
           <Popconfirm
             title="Delete product"
@@ -70,16 +70,17 @@ const Product = () => {
 
   const data: ProductType[] = [
     {
-      key: "1",
+      id: "1",
       name: "T-shirt Basic",
       price: 20000,
       material: "Cotton",
       color: "Red",
       size: "M",
       image: ProductImage,
+      favourites: false,
     },
     {
-      key: "2",
+      id: "2",
       name: "Denim Jacket",
       price: 49000,
       material: "Denim",
@@ -87,9 +88,10 @@ const Product = () => {
       size: "L",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "3",
+      id: "3",
       name: "Sneakers Sport",
       price: 89.99,
       material: "Synthetic",
@@ -97,9 +99,10 @@ const Product = () => {
       size: "42",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "4",
+      id: "4",
       name: "Basic Hoodie",
       price: 29.99,
       material: "Cotton",
@@ -107,9 +110,10 @@ const Product = () => {
       size: "L",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "5",
+      id: "5",
       name: "Chinos Pants",
       price: 39.99,
       material: "Cotton",
@@ -117,9 +121,10 @@ const Product = () => {
       size: "M",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "6",
+      id: "6",
       name: "Summer Dress",
       price: 59.99,
       material: "Linen",
@@ -127,9 +132,10 @@ const Product = () => {
       size: "S",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "7",
+      id: "7",
       name: "Leather Jacket",
       price: 99.99,
       material: "Leather",
@@ -137,9 +143,10 @@ const Product = () => {
       size: "M",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "8",
+      id: "8",
       name: "Sports Shorts",
       price: 24.99,
       material: "Polyester",
@@ -147,9 +154,10 @@ const Product = () => {
       size: "M",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "9",
+      id: "9",
       name: "Casual Shirt",
       price: 34.99,
       material: "Cotton",
@@ -157,9 +165,10 @@ const Product = () => {
       size: "L",
       image:
         ProductImage,
+      favourites: false,
     },
     {
-      key: "10",
+      id: "10",
       name: "Boots",
       price: 89.99,
       material: "Leather",
@@ -167,6 +176,7 @@ const Product = () => {
       size: "42",
       image:
         ProductImage,
+      favourites: false,
     },
   ];
 

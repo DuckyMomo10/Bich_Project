@@ -1,6 +1,6 @@
 import { DeleteFilled, HeartOutlined } from "@ant-design/icons";
 import { Badge, Button, Drawer, Popconfirm, Space } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import FormatCurrent from "../services/FormatCurrent";
 import imgProduct from "../assets/product.jpg";
 import { useFavourite } from "../context/FavouriteContext";

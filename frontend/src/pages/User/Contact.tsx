@@ -1,11 +1,10 @@
-import React from "react";
 import HeaderComponent from "../../components/Header/HeaderComponent";
 import FooterComponent from "../../components/Footer/FooterComponent";
-import { Card, Typography, Space, Button } from "antd";
+import { Card, Typography, Space } from "antd";
 import {
   PhoneOutlined,
   InstagramOutlined,
-  FacebookOutlined,
+  // FacebookOutlined,
   FacebookFilled,
 } from "@ant-design/icons";
 import Instagram from "../../assets/instagram.png";

@@ -1,5 +1,5 @@
 import { Card, Typography, message } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import imgProduct from "../assets/product.jpg";
 import FormatCurrent from "../services/FormatCurrent";
@@ -16,7 +16,7 @@ const colors = ["#ad7a2b", "#775621", "#5e4318"];
 
 const CardProduct = ({ product }: { product: ExtendedProduct }) => {
   const [like, setLike] = useState(false);
-  const { favourites, toggleFavourite, isFavourite } = useFavourite();
+  const { toggleFavourite } = useFavourite();
 
   const handleLike = () => {
     setLike(!like);

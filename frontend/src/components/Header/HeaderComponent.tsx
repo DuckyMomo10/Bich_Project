@@ -1,42 +1,31 @@
-import { Badge, Drawer, Input, Space } from "antd";
+import { Input } from "antd";
 import { Header } from "antd/es/layout/layout";
 import React from "react";
 import { useState } from "react";
-import { Link, NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 import Logo from "../../assets/logo.png";
-import imgProduct from "../../assets/product.jpg"; // ảnh mặc định
 import {
   CloseOutlined,
-  HeartOutlined,
   SearchOutlined,
-  ShoppingOutlined,
   UserOutlined,
-  RestFilled,
 } from "@ant-design/icons";
-import FormatCurrent from "../../services/FormatCurrent";
 import Favourite from "../Favourite";
 import Cart from "../Cart";
 
-const HeaderComponent = ({ product }) => {
+const HeaderComponent = () => {
   const [showSearch, setShowSearch] = useState(false);
-  const [open, setOpen] = useState(false);
-  // State dùng để lưu nội dung từ ô input tìm kiếm
   const [searchText, setSearchText] = useState("");
 
-  // Hàm để bật/tắt ô tìm kiếm mỗi khi người dùng nhấn nút tìm kiếm
   const toggleSearch = () => {
     setShowSearch((prev) => !prev);
   };
 
-  // Hàm xử lý khi người dùng nhấn phím trong ô input
-  // Nếu nhấn phím "Enter" thì sẽ gọi hàm tìm kiếm
   const onSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
 
-  // Hàm thực hiện tìm kiếm: in ra kết quả tìm kiếm và ẩn ô tìm kiếm sau khi thực hiện
   const handleSearch = () => {
     console.log("Search:", searchText);
     setShowSearch(false);

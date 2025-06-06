@@ -3,73 +3,11 @@ import { Content } from "antd/es/layout/layout";
 import { Outlet } from "react-router";
 import HeaderComponent from "../../components/Header/HeaderComponent";
 import CardProduct from "../../components/CardProduct";
-import { ProductType } from "../../types/Product";
 import FooterComponent from "../../components/Footer/FooterComponent";
 import Instagram from "../../assets/instagram.png";
 import { mockProducts } from "../../types/mockProduct";
 
 const Home = () => {
-  const products = [
-    {
-      id: "sp01",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 299000,
-      material: "Cotton 100%",
-      color: "Trắng",
-      size: "M",
-    },
-    {
-      id: "sp02",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 199000,
-      material: "Polyester",
-      color: "Đen",
-      size: "L",
-    },
-    {
-      id: "sp03",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 399000,
-      material: "Jean",
-      color: "Xanh",
-      size: "32",
-    },
-    {
-      id: "sp04",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 299000,
-      material: "Cotton 100%",
-      color: "Trắng",
-      size: "M",
-    },
-    {
-      id: "sp05",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 299000,
-      material: "Cotton 100%",
-      color: "Trắng",
-      size: "M",
-    },
-    {
-      id: "sp06",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 299000,
-      material: "Cotton 100%",
-    },
-    {
-      id: "sp07",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 299000,
-      material: "Cotton 100%",
-    },
-    {
-      id: "sp08",
-      name: "Bàn chữ L kết hợp kệ lưu trữ",
-      price: 299000,
-      material: "Cotton 100%",
-    },
-  ];
-
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <div

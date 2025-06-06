@@ -1,9 +1,8 @@
-import React from "react";
 import { Layout, Space, Typography } from "antd";
 import {
   FacebookFilled,
   InstagramOutlined,
-  PinterestFilled,
+  // PinterestFilled,
 } from "@ant-design/icons";
 import { NavLink } from "react-router";
 import Threads from "../../assets/threads-white-icon.png"
