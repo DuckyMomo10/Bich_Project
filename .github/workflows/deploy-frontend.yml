@@ -1,0 +1,41 @@
+name: Deploy Frontend to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Chạy workflow khi có commit được đẩy lên nhánh main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # Sử dụng môi trường Ubuntu mới nhất để chạy job
+
+    steps:
+      - name: Checkout code # Bước 1: Lấy mã nguồn từ repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js # Bước 2: Cài đặt môi trường Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Bạn có thể thay đổi version Node.js nếu cần
+
+      - name: Navigate to frontend directory # Bước 3: Di chuyển vào thư mục frontend
+        run: cd frontend
+
+      - name: Install dependencies # Bước 4: Cài đặt dependencies của frontend
+        run: cd frontend && npm install # Hoặc 'cd frontend && yarn install' nếu bạn dùng yarn
+
+      - name: Build frontend # Bước 5: Chạy lệnh build dự án frontend
+        run: cd frontend && npm run build
+
+      - name: Upload artifact # Bước 6: Tải thư mục dist lên như một artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist # Đường dẫn đến thư mục build sau khi chạy npm run build
+
+      - name: Deploy to GitHub Pages # Bước 7: Triển khai artifact lên GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          url: ${{ steps.deployment.outputs.page_url }} # URL của trang Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Token được cung cấp tự động 
