@@ -8,6 +8,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest # Sử dụng môi trường Ubuntu mới nhất để chạy job
+    permissions:
+      id-token: write
+      pages: write
+      contents: read
 
     steps:
       - name: Checkout code # Bước 1: Lấy mã nguồn từ repository
