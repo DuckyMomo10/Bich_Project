@@ -147,13 +147,13 @@ export const updateProduct = async (req, res) => {
       isAvailable,
     } = req.body;
 
-    // Lấy sản phẩm hiện tại
+    // Find existing product
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Kiểm tra trùng tên với sản phẩm khác
+    // Check if new name conflicts with other products
     const existingProduct = await checkNameProduct(name);
     if (existingProduct && existingProduct._id.toString() !== id) {
       return res.status(400).json({ message: "Product name already exists" });
