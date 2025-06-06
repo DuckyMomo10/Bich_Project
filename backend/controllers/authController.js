@@ -96,7 +96,7 @@ export const login = async (req, res) => {
   }
 };
 
-const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -116,7 +116,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-const updateUserProfile = async (req, res) => {
+export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -124,9 +124,18 @@ const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Cập nhật các trường nếu có trong req.body
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
+    user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+    user.address = req.body.address || user.address;
 
+    // Chỉ admin mới được cập nhật role
+    if (req.user.role === 'admin' && req.body.role) {
+      user.role = req.body.role;
+    }
+
+    // Cập nhật password nếu có
     if (req.body.password) {
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(req.body.password, salt);
@@ -138,14 +147,18 @@ const updateUserProfile = async (req, res) => {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
-      isAdmin: updatedUser.isAdmin,
+      phoneNumber: updatedUser.phoneNumber,
+      address: updatedUser.address,
+      role: updatedUser.role,
+      isAdmin: updatedUser.role === 'admin',
       token: generateToken(updatedUser._id),
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const forgotPassword = async (req, res) => {
   try {

@@ -4,6 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auths.js";
+import productRouter from "./routes/products.js";
 
 dotenv.config();
 
@@ -30,13 +31,15 @@ const connect = async () => {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
+app.use("/uploads", express.static("uploads"));
+
 
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
 app.use('/api/auth', authRouter)
-
+app.use('/api/product', productRouter); 
 // Middleware
 app.use((error, req, res, next) => {
     console.log(error.stack);
