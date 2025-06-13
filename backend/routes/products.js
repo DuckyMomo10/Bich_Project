@@ -6,24 +6,20 @@ import {
   deleteProduct,
   createProduct
 } from '../controllers/productController.js'
-
+import { protect, adminOnly } from '../middlewares/authMiddleware.js'
 import upload from '../middlewares/uploadMiddleware.js'
 
 const router = express.Router()
 
-// Upload và tạo sản phẩm
-router.post('/create', upload.array('images', 5), createProduct)
+// Public routes
+router.get('/', getProducts)
+router.get('/product/:id', getProductById)
+
+// Protected admin routes
+router.post('/create', protect, adminOnly, upload.array('images', 5), createProduct)
+router.delete('/delete/:id', protect, adminOnly, deleteProduct)
 
 // Cập nhật sản phẩm và ảnh mới nếu có
 router.put('/update/:id', upload.array('images', 5), updateProduct)
-
-// Lấy danh sách sản phẩm
-router.get('/', getProducts)
-
-// Lấy sản phẩm theo ID
-router.get('/product/:id', getProductById)
-
-// Xoá sản phẩm
-router.delete('/delete/:id', deleteProduct)
 
 export default router;

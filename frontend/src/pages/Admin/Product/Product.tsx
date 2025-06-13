@@ -1,26 +1,120 @@
-import { Button, Pagination, Popconfirm, Space, Table, Tag } from "antd";
+import { Button, Pagination, Popconfirm, Space, Table, message } from "antd";
 import type { TableProps } from "antd";
 import { useState } from "react";
 import { NavLink } from "react-router";
 import FormatCurrent from "../../../services/FormatCurrent";
-import ProductImage from "../../../assets/product.jpg"
+import { API_URL } from "../../../utils/config.js";
 import { ProductType } from "../../../types/Product";
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "../../../utils/axios.js";
+import  errorImage  from '../../../image/pngtree-no-image-available-icon-flatvector-illustration-pic-design-profile-vector-png-image_40966566.jpg'
 const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 5;
+  const queryClient = useQueryClient();
+
+  const {
+    data: response,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<{
+    products: ProductType[];
+    totalPages: number;
+    currentPage: number;
+  }>({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get("/products");
+      return data;
+    },
+  });
+
+  const products = response?.products || [];
+
+  // Thêm dòng này để kiểm tra dữ liệu
+  console.log("Product data response:", response);
+
+  const deleteMutation = useMutation<void, Error, string>({
+    mutationFn: async (id: string) => {
+      if (!id) {
+        throw new Error("Product ID is required");
+      }
+      try {
+        const response = await axiosInstance.delete(`/products/delete/${id}`);
+        return response.data;
+      } catch (error: any) {
+        console.error("Delete error:", error);
+        if (error.response) {
+          throw new Error(
+            error.response.data.message || "Failed to delete product"
+          );
+        }
+        throw new Error(error.message || "Failed to delete product");
+      }
+    },
+    onSuccess: () => {
+      message.success("Product deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: (error: any) => {
+      message.error(error.message || "Failed to delete product");
+    },
+  });
+
   const columns: TableProps<ProductType>["columns"] = [
+    {
+      title: "STT",
+      key: "stt",
+      render: (_, __, index) => (currentPage - 1) * productsPerPage + index + 1,
+    },
+    {
+      title: "ID",
+      dataIndex: "_id",
+      key: "_id",
+      render: (id: string) => <>{id.substring(0, 8)}...</>,
+    },
+    {
+      title: "Image",
+      dataIndex: "images",
+      key: "image",
+      render: (image: string[]) => {
+        if (!image || image.length === 0) {
+          console.log('Rendering placeholder for image:', image);
+          return (
+            <img
+              src={errorImage}
+              alt="No image available"
+              style={{
+                width: "80px",
+                height: "80px",
+                objectFit: "cover",
+                borderRadius: "4px",
+                border: "1px solid #eee",
+              }}
+            />
+          );
+        }
+        const imageUrl = image[0]?.replace(/\\/g, '/');
+        console.log('Processed imageUrl:', imageUrl);
+        return imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Product"
+            style={{
+              width: "80px",
+              height: "80px",
+              objectFit: "cover",
+              borderRadius: "4px",
+            }}
+          />
+        ) : null;
+      },
+    },
     {
       title: "Name Product",
       dataIndex: "name",
       key: "name",
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Image",
-      dataIndex: "image",
-      key: "image",
-      render: (image: string) => <img src={image} alt={"hi"} width="150" />,
     },
     {
       title: "Price",
@@ -29,37 +123,41 @@ const Product = () => {
       render: (price: number) => <FormatCurrent price={price} />,
     },
     {
-      title: "Material",
-      dataIndex: "material",
-      key: "material",
-    },
-    {
       title: "Color",
       dataIndex: "color",
       key: "color",
-      render: (color) => <Tag color="blue">{color}</Tag>,
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Space size="middle">
-          <Button variant="solid" color="primary">
-            <NavLink to={`/admin/detail-product/${record.id}`}>Detail</NavLink>
+        <Space size={"middle"}>
+          <Button type="default">
+            <NavLink to={`/admin/detail-product/${record._id}`}>Detail</NavLink>
           </Button>
-          <Button variant="solid" color="gold">
-            <NavLink to={`/admin/edit-product/${record.id}`}>Edit</NavLink>
+          <Button type="primary">
+            <NavLink to={`/admin/edit-product/${record._id}`}>Edit</NavLink>
           </Button>
           <Popconfirm
-            title="Delete product"
-            description="Are you sure you want to delete this product?"
+            title="Delete Product"
+            description="Are you sure to delete this product?"
+            onConfirm={() => {
+              if (!record._id) {
+                message.error("Invalid product ID");
+                return;
+              }
+              deleteMutation.mutate(record._id);
+            }}
+            okText="Yes"
+            cancelText="No"
           >
-            <Button type="primary" danger>
+            <Button
+              danger
+              loading={
+                deleteMutation.isPending &&
+                deleteMutation.variables === record._id
+              }
+            >
               Delete
             </Button>
           </Popconfirm>
@@ -68,123 +166,25 @@ const Product = () => {
     },
   ];
 
-  const data: ProductType[] = [
-    {
-      id: "1",
-      name: "T-shirt Basic",
-      price: 20000,
-      material: "Cotton",
-      color: "Red",
-      size: "M",
-      image: ProductImage,
-      favourites: false,
-    },
-    {
-      id: "2",
-      name: "Denim Jacket",
-      price: 49000,
-      material: "Denim",
-      color: "Blue",
-      size: "L",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "3",
-      name: "Sneakers Sport",
-      price: 89.99,
-      material: "Synthetic",
-      color: "White",
-      size: "42",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "4",
-      name: "Basic Hoodie",
-      price: 29.99,
-      material: "Cotton",
-      color: "Black",
-      size: "L",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "5",
-      name: "Chinos Pants",
-      price: 39.99,
-      material: "Cotton",
-      color: "Khaki",
-      size: "M",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "6",
-      name: "Summer Dress",
-      price: 59.99,
-      material: "Linen",
-      color: "Pink",
-      size: "S",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "7",
-      name: "Leather Jacket",
-      price: 99.99,
-      material: "Leather",
-      color: "Black",
-      size: "M",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "8",
-      name: "Sports Shorts",
-      price: 24.99,
-      material: "Polyester",
-      color: "Grey",
-      size: "M",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "9",
-      name: "Casual Shirt",
-      price: 34.99,
-      material: "Cotton",
-      color: "Blue",
-      size: "L",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-    {
-      id: "10",
-      name: "Boots",
-      price: 89.99,
-      material: "Leather",
-      color: "Brown",
-      size: "42",
-      image:
-        ProductImage,
-      favourites: false,
-    },
-  ];
-
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = data.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
 
   const handlePageChange = (page: number) => setCurrentPage(page);
+
+  // Thêm dòng này để kiểm tra dữ liệu trước khi render bảng
+  console.log('Current products for table:', currentProducts);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <>
@@ -206,15 +206,18 @@ const Product = () => {
         dataSource={currentProducts}
         columns={columns}
         pagination={false}
+        rowKey="_id"
       />
-      <Pagination
-        current={currentPage}
-        pageSize={productsPerPage}
-        total={data.length}
-        onChange={handlePageChange}
-        align="end"
-        style={{ marginTop: "20px", textAlign: "center" }}
-      />
+      {products && products.length > productsPerPage && (
+        <Pagination
+          current={currentPage}
+          pageSize={productsPerPage}
+          total={products.length}
+          onChange={handlePageChange}
+          align="end"
+          style={{ marginTop: "20px", textAlign: "center" }}
+        />
+      )}
     </>
   );
 };

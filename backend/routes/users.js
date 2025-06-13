@@ -1,5 +1,5 @@
 import express from 'express'
-import { verifyToken, verifyAdmin } from '../middlewares/auth.js'
+import { protect, adminOnly } from '../middlewares/authMiddleware.js'
 import { 
   getAllUsers,
   getUserById,
@@ -11,14 +11,12 @@ import {
 
 const router = express.Router()
 
-// Admin only routes
-router.use(verifyToken, verifyAdmin)
-
-router.get('/', getAllUsers)
-router.get('/:id', getUserById)
-router.put('/:id', updateUser)
-router.delete('/:id', deleteUser)
-router.put('/:id/deactivate', deactivateUser)
-router.put('/:id/activate', activateUser)
+// Protected and Admin routes
+router.get('/', protect, adminOnly, getAllUsers)
+router.get('/:id', protect, getUserById)
+router.put('/:id', protect, updateUser)
+router.delete('/:id', protect, adminOnly, deleteUser)
+router.put('/:id/deactivate', protect, deactivateUser)
+router.put('/:id/activate', protect, activateUser)
 
 export default router

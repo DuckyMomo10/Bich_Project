@@ -1,11 +1,12 @@
 import { Layout, Menu } from "antd";
 import { HomeOutlined, ShoppingOutlined, UserOutlined } from "@ant-design/icons";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Sider from "antd/es/layout/Sider";
 import { Content, Header } from "antd/es/layout/layout";
 import { useState, useEffect } from "react";
 
 const LayoutAdmin = () => {
+  const navigate = useNavigate();
   const [selectedKey, setSelectedKey] = useState("");
 
   useEffect(() => {
@@ -21,6 +22,12 @@ const LayoutAdmin = () => {
     setSelectedKey(e.key);
     localStorage.setItem("selectedMenuKey", e.key);
   };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("selectedMenuKey");
+    navigate("/login");
+  }
 
   return (
     <Layout style={{ minHeight: "100vh" }}>

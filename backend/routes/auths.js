@@ -7,7 +7,7 @@ import {
   forgotPassword,
   resetPassword 
 } from '../controllers/authController.js'
-import { verifyToken } from '../middlewares/auth.js'
+import { protect } from '../middlewares/authMiddleware.js'
 
 const router = express.Router()
 
@@ -18,7 +18,7 @@ router.post('/forgot-password', forgotPassword)
 router.post('/reset-password', resetPassword)
 
 // Protected routes
-router.get('/profile', verifyToken, getUserProfile)
-router.put('/profile', verifyToken, updateUserProfile)
+router.get('/profile', protect, getUserProfile)
+router.put('/profile', protect, updateUserProfile)
 
 export default router

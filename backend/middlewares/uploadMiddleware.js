@@ -7,7 +7,8 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/')
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`)
+        const filename = `${Date.now()}-${file.originalname}`.replace(/\\/g, '/');
+        cb(null, filename)
     }
 })
 

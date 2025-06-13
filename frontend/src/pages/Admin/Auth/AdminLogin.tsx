@@ -1,10 +1,32 @@
+import { useMutation } from "@tanstack/react-query";
 import { Button, Card, Form, Input, Typography } from "antd";
+import axios from "axios";
 const { Title, Text } = Typography;
-
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import "../admin.css"
+import { FormValues } from "../../../types/FormValues";
 
 const Login = () => {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: FormValues) => {
+      const res = await axios.post("http://localhost:8000/api/auth/login", data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token);
+      navigate("/admin/dashboard");
+    },
+    onError: (error) => {
+      console.log(error || "Đăng ký thất bại");
+    }
+  })
+
+  const handleSubmit = (values: FormValues) => {
+    mutate(values);
+  }
   return (
     <div
       style={{
@@ -17,7 +39,7 @@ const Login = () => {
     >
       <Card
         title={
-          <Title level={3} style={{ textAlign: "center" }}>
+          <Title level={3} style={{ textAlign: "center", textTransform: "uppercase" }}>
             Login
           </Title>
         }
@@ -33,8 +55,7 @@ const Login = () => {
           form={form}
           name="login-form"
           layout="vertical"
-          // onFinish={handleSubmit}
-          autoComplete="off"
+          onFinish={handleSubmit}
         >
           <Form.Item
             label="Email"

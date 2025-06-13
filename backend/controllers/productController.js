@@ -15,8 +15,17 @@ export const getProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const totalPages = Math.ceil(totalProducts / limitNumber);
 
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const formattedProducts = products.map((product) => ({
+      ...product.toObject(),
+      images:
+        product.images?.length > 0
+          ? product.images
+          : [`${baseUrl}/api/uploads/default-image.jpg`],
+    }));
+
     res.json({
-      products,
+      products: formattedProducts,
       totalPages,
       currentPage: pageNumber,
     });
@@ -40,18 +49,18 @@ const checkNameProduct = async (name) => {
  */
 const validateImage = (file) => {
   // Define allowed image types
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
   // Set maximum file size (5MB)
   const maxSize = 5 * 1024 * 1024;
 
   // Check if file type is allowed
   if (!allowedTypes.includes(file.mimetype)) {
-    throw new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.');
+    throw new Error("Invalid file type. Only JPEG, PNG and GIF are allowed.");
   }
 
   // Check if file size is within limit
   if (file.size > maxSize) {
-    throw new Error('File size too large. Maximum size is 5MB.');
+    throw new Error("File size too large. Maximum size is 5MB.");
   }
 };
 
@@ -100,10 +109,22 @@ export const createProduct = async (req, res) => {
       }
     }
 
-    // Get paths of uploaded images
-    const images = req.files ? req.files.map((file) => file.path) : [];
+    // Convert image paths to full URLs
+    const images = req.files
+      ? req.files.map(file => {
+          console.log('Tên file gốc:', file.filename);
+          let filename = file.filename;
+          // Loại bỏ tiền tố /api/uploads/ nếu đã tồn tại
+          if (filename.includes('/api/uploads/')) {
+            filename = filename.split('/api/uploads/').pop();
+          }
+          return `${req.protocol}://${req.get("host")}/api/uploads/${filename}`;
+        })
+      : [];
+console.log(req.files);
 
-    // Create new product with image paths
+
+    // Create new product
     const newProduct = new Product({
       name,
       price,
@@ -117,15 +138,18 @@ export const createProduct = async (req, res) => {
     });
 
     await newProduct.save();
-    res
-      .status(201)
-      .json({ message: "Product created successfully", product: newProduct });
+    res.status(201).json({
+      message: "Product created successfully",
+      product: newProduct,
+    });
   } catch (error) {
-    // If there's an error, clean up any uploaded images
+    // Clean up uploaded images if error
     if (req.files) {
-      await Promise.all(req.files.map(file => deleteImageFile(file.path)));
+      await Promise.all(req.files.map((file) => deleteImageFile(file.path)));
     }
-    res.status(500).json({ message: error.message || "Error creating product" });
+    res
+      .status(500)
+      .json({ message: error.message || "Error creating product" });
   }
 };
 
@@ -147,19 +171,19 @@ export const updateProduct = async (req, res) => {
       isAvailable,
     } = req.body;
 
-    // Find existing product
+    // Find product
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Check if new name conflicts with other products
+    // Check name conflict
     const existingProduct = await checkNameProduct(name);
     if (existingProduct && existingProduct._id.toString() !== id) {
       return res.status(400).json({ message: "Product name already exists" });
     }
 
-    // Validate new images if any are uploaded
+    // Validate new images
     if (req.files) {
       for (const file of req.files) {
         validateImage(file);
@@ -168,12 +192,25 @@ export const updateProduct = async (req, res) => {
 
     let images;
     if (req.files && req.files.length > 0) {
-      // Get paths of new images
-      images = req.files.map((file) => file.path);
+      // Convert new image paths to URLs
+      images = req.files.map(file => {
+          console.log('Tên file gốc trong updateProduct:', file.filename);
+          let filename = file.filename;
+          // Loại bỏ tiền tố /api/uploads/ nếu đã tồn tại
+          if (filename.includes('/api/uploads/')) {
+            filename = filename.split('/api/uploads/').pop();
+          }
+          return `${req.protocol}://${req.get("host")}/api/uploads/${filename}`;
+        });
 
-      // Delete old images if new ones are uploaded
+      // Delete old images
       if (product.images && product.images.length > 0) {
-        await Promise.all(product.images.map(imgPath => deleteImageFile(imgPath)));
+        const imagePaths = product.images.map((url) =>
+          path.join("uploads", path.basename(url))
+        );
+        await Promise.all(
+          imagePaths.map((imgPath) => deleteImageFile(imgPath))
+        );
       }
     }
 
@@ -187,26 +224,30 @@ export const updateProduct = async (req, res) => {
       quantity,
       category,
       isAvailable,
-    };  
+    };
 
-    // Add new images to update data if any
     if (images) {
       updateData.images = images;
     }
 
-    // Update product in database
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
     });
 
-    res.status(200).json({ message: `Product updated successfully` });
+    res
+      .status(200)
+      .json({
+        message: "Product updated successfully",
+        product: updatedProduct,
+      });
   } catch (error) {
-    // Clean up any newly uploaded images if there's an error
     if (req.files) {
-      await Promise.all(req.files.map(file => deleteImageFile(file.path)));
+      await Promise.all(req.files.map((file) => deleteImageFile(file.path)));
     }
     console.error("Update error:", error.message);
-    res.status(500).json({ message: error.message || "Error updating product" });
+    res
+      .status(500)
+      .json({ message: error.message || "Error updating product" });
   }
 };
 
@@ -225,12 +266,16 @@ export const deleteProduct = async (req, res) => {
 
     // Delete all associated images
     if (product.images && product.images.length > 0) {
-      await Promise.all(product.images.map(imgPath => deleteImageFile(imgPath)));
+      await Promise.all(
+        product.images.map((imgPath) => deleteImageFile(imgPath))
+      );
     }
 
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message || "Error deleting product" });
+    res
+      .status(500)
+      .json({ message: error.message || "Error deleting product" });
   }
 };
 
@@ -242,7 +287,16 @@ export const getProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    res.status(200).json(product);
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const productObj = product.toObject();
+
+    productObj.images =
+      productObj.images?.length > 0
+        ? productObj.images
+        : [`${baseUrl}/api/uploads/default-image.jpg`]; // fallback ảnh nếu không có
+
+    res.status(200).json(productObj);
   } catch (error) {
     res.status(500).json({ message: "Error getting product" });
   }
