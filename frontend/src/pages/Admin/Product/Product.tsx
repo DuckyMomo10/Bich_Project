@@ -1,15 +1,16 @@
 import { Button, Pagination, Popconfirm, Space, Table, message } from "antd";
 import type { TableProps } from "antd";
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom"; // ✅ thêm dòng này
 import { NavLink } from "react-router";
-import FormatCurrent from "../../../services/FormatCurrent";
-import { API_URL } from "../../../utils/config.js";
-import { ProductType } from "../../../types/Product";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import FormatCurrent from "../../../services/FormatCurrent";
+import { ProductType } from "../../../types/Product";
 import axiosInstance from "../../../utils/axios.js";
-import  errorImage  from '../../../image/pngtree-no-image-available-icon-flatvector-illustration-pic-design-profile-vector-png-image_40966566.jpg'
+import errorImage from "../../../image/pngtree-no-image-available-icon-flatvector-illustration-pic-design-profile-vector-png-image_40966566.jpg";
+
 const Product = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams(); // ✅ dùng searchParams
+  const currentPage = parseInt(searchParams.get("page") || "1", 10); // ✅ lấy từ URL
   const productsPerPage = 5;
   const queryClient = useQueryClient();
 
@@ -37,21 +38,8 @@ const Product = () => {
 
   const deleteMutation = useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
-      if (!id) {
-        throw new Error("Product ID is required");
-      }
-      try {
-        const response = await axiosInstance.delete(`/products/delete/${id}`);
-        return response.data;
-      } catch (error: any) {
-        console.error("Delete error:", error);
-        if (error.response) {
-          throw new Error(
-            error.response.data.message || "Failed to delete product"
-          );
-        }
-        throw new Error(error.message || "Failed to delete product");
-      }
+      const res = await axiosInstance.delete(`/products/delete/${id}`);
+      return res.data;
     },
     onSuccess: () => {
       message.success("Product deleted successfully");
@@ -80,7 +68,6 @@ const Product = () => {
       key: "image",
       render: (image: string[]) => {
         if (!image || image.length === 0) {
-          console.log('Rendering placeholder for image:', image);
           return (
             <img
               src={errorImage}
@@ -95,8 +82,7 @@ const Product = () => {
             />
           );
         }
-        const imageUrl = image[0]?.replace(/\\/g, '/');
-        console.log('Processed imageUrl:', imageUrl);
+        const imageUrl = image[0]?.replace(/\\/g, "/");
         return imageUrl ? (
           <img
             src={imageUrl}
@@ -126,6 +112,27 @@ const Product = () => {
       title: "Color",
       dataIndex: "color",
       key: "color",
+      render: (colors: string[]) => (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+          {colors && colors.length > 0 ? (
+            colors.map((colorItem, index) => (
+              <div
+                key={index}
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  backgroundColor: colorItem,
+                  border: '1px solid #d9d9d9',
+                  borderRadius: '4px',
+                }}
+                title={colorItem}
+              />
+            ))
+          ) : (
+            <span>N/A</span>
+          )}
+        </div>
+      ),
     },
     {
       title: "Action",
@@ -142,10 +149,7 @@ const Product = () => {
             title="Delete Product"
             description="Are you sure to delete this product?"
             onConfirm={() => {
-              if (!record._id) {
-                message.error("Invalid product ID");
-                return;
-              }
+              if (!record._id) return message.error("Invalid product ID");
               deleteMutation.mutate(record._id);
             }}
             okText="Yes"
@@ -173,18 +177,12 @@ const Product = () => {
     indexOfLastProduct
   );
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handlePageChange = (page: number) => {
+    setSearchParams({ page: page.toString() }); // ✅ cập nhật URL
+  };
 
-  // Thêm dòng này để kiểm tra dữ liệu trước khi render bảng
-  console.log('Current products for table:', currentProducts);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error: {error.message}</div>;
-  }
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error.message}</div>;
 
   return (
     <>
@@ -208,7 +206,7 @@ const Product = () => {
         pagination={false}
         rowKey="_id"
       />
-      {products && products.length > productsPerPage && (
+      {products.length > productsPerPage && (
         <Pagination
           current={currentPage}
           pageSize={productsPerPage}

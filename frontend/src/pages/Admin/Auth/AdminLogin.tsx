@@ -84,6 +84,7 @@ const Login = () => {
               type="primary"
               htmlType="submit"
               block
+              loading= {isPending}
               style={{ height: "40px", fontSize: "16px", fontWeight: "bold" }}
             >
               Login

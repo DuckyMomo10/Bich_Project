@@ -2,19 +2,14 @@ import Product from "../models/Product.js";
 import fs from "fs";
 import path from "path";
 
-// Get all products
+// Get all products (without category filter)
 export const getProducts = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const pageNumber = parseInt(page);
-    const limitNumber = parseInt(limit);
-    const skip = (pageNumber - 1) * limitNumber;
+    // Lấy toàn bộ sản phẩm từ DB, không phân trang
+    const products = await Product.find().exec();
+    console.log("Fetched products from database:", products);
 
-    const products = await Product.find().skip(skip).limit(limitNumber).exec();
-
-    const totalProducts = await Product.countDocuments();
-    const totalPages = Math.ceil(totalProducts / limitNumber);
-
+    // Xử lý hình ảnh mặc định nếu thiếu
     const baseUrl = `${req.protocol}://${req.get("host")}`;
     const formattedProducts = products.map((product) => ({
       ...product.toObject(),
@@ -26,10 +21,9 @@ export const getProducts = async (req, res) => {
 
     res.json({
       products: formattedProducts,
-      totalPages,
-      currentPage: pageNumber,
     });
   } catch (error) {
+    console.error("Error retrieving products:", error);
     res.status(500).json({ message: "Error retrieving products" });
   }
 };
@@ -40,6 +34,28 @@ const checkNameProduct = async (name) => {
     name: { $regex: new RegExp("^" + name + "$", "i") },
   });
   return product;
+};
+
+/**
+ * Validate HEX color code
+ * @param {string} color - The color code to validate
+ * @returns {boolean} Whether the color code is valid
+ */
+const isValidHexColor = (color) => {
+  const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+  return hexColorRegex.test(color);
+};
+
+/**
+ * Validate array of colors
+ * @param {Array} colors - Array of color codes to validate
+ * @returns {boolean} Whether all colors are valid
+ */
+const validateColors = (colors) => {
+  if (!Array.isArray(colors) || colors.length === 0) {
+    return false;
+  }
+  return colors.every(color => isValidHexColor(color));
 };
 
 /**
@@ -55,12 +71,12 @@ const validateImage = (file) => {
 
   // Check if file type is allowed
   if (!allowedTypes.includes(file.mimetype)) {
-    throw new Error("Invalid file type. Only JPEG, PNG and GIF are allowed.");
+    throw new Error("Loại file không hợp lệ. Chỉ chấp nhận JPEG, PNG và GIF.");
   }
 
   // Check if file size is within limit
   if (file.size > maxSize) {
-    throw new Error("File size too large. Maximum size is 5MB.");
+    throw new Error("Kích thước file quá lớn. Kích thước tối đa là 5MB.");
   }
 };
 
@@ -85,13 +101,14 @@ const deleteImageFile = async (imagePath) => {
  */
 export const createProduct = async (req, res) => {
   try {
+    console.log('Dữ liệu request:', req.body);
     const {
       name,
       price,
+      material,
       description,
       specification,
       color,
-      quantity,
       category,
       isAvailable,
     } = req.body;
@@ -99,7 +116,15 @@ export const createProduct = async (req, res) => {
     // Check if product name already exists
     const existProduct = await checkNameProduct(name);
     if (existProduct) {
-      return res.status(400).json({ message: "Product name already exists" });
+      return res.status(400).json({ message: "Tên sản phẩm đã tồn tại" });
+    }
+
+    // Validate colors
+    const colors = Array.isArray(color) ? color : [color];
+    if (!validateColors(colors)) {
+      return res.status(400).json({ 
+        message: "Màu sắc không hợp lệ. Vui lòng sử dụng mã màu HEX (ví dụ: #FF0000)" 
+      });
     }
 
     // Validate all uploaded images
@@ -121,17 +146,15 @@ export const createProduct = async (req, res) => {
           return `${req.protocol}://${req.get("host")}/api/uploads/${filename}`;
         })
       : [];
-console.log(req.files);
-
 
     // Create new product
     const newProduct = new Product({
       name,
       price,
+      material,
       description,
       specification,
-      color,
-      quantity,
+      color: colors,
       category,
       isAvailable,
       images,
@@ -139,7 +162,7 @@ console.log(req.files);
 
     await newProduct.save();
     res.status(201).json({
-      message: "Product created successfully",
+      message: "Tạo sản phẩm thành công",
       product: newProduct,
     });
   } catch (error) {
@@ -149,7 +172,7 @@ console.log(req.files);
     }
     res
       .status(500)
-      .json({ message: error.message || "Error creating product" });
+      .json({ message: error.message || "Lỗi khi tạo sản phẩm" });
   }
 };
 
@@ -163,10 +186,10 @@ export const updateProduct = async (req, res) => {
     const {
       name,
       price,
+      material,
       description,
       specification,
       color,
-      quantity,
       category,
       isAvailable,
     } = req.body;
@@ -175,6 +198,14 @@ export const updateProduct = async (req, res) => {
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Validate colors
+    const colors = Array.isArray(color) ? color : [color];
+    if (!validateColors(colors)) {
+      return res.status(400).json({ 
+        message: "Màu sắc không hợp lệ. Vui lòng sử dụng mã màu HEX (ví dụ: #FF0000)" 
+      });
     }
 
     // Check name conflict
@@ -218,10 +249,10 @@ export const updateProduct = async (req, res) => {
     const updateData = {
       name,
       price,
+      material,
       description,
       specification,
-      color,
-      quantity,
+      color: colors,
       category,
       isAvailable,
     };
@@ -301,3 +332,7 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ message: "Error getting product" });
   }
 };
+
+
+
+

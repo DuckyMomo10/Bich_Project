@@ -3,9 +3,6 @@ import { API_URL } from './config';
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Thêm interceptor để tự động thêm token vào header

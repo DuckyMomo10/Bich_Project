@@ -1,5 +1,9 @@
 import { Layout, Menu } from "antd";
-import { HomeOutlined, ShoppingOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  HomeOutlined,
+  ShoppingOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Sider from "antd/es/layout/Sider";
 import { Content, Header } from "antd/es/layout/layout";
@@ -10,13 +14,17 @@ const LayoutAdmin = () => {
   const [selectedKey, setSelectedKey] = useState("");
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/admin/login", { replace: true });
+    }
     const savedKey = localStorage.getItem("selectedMenuKey");
     if (savedKey) {
       setSelectedKey(savedKey);
     } else {
       setSelectedKey("1");
     }
-  }, []);
+  }, [navigate]);
 
   const handleMenuSelect = (e: { key: string }) => {
     setSelectedKey(e.key);
@@ -26,8 +34,8 @@ const LayoutAdmin = () => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("selectedMenuKey");
-    navigate("/login");
-  }
+    navigate("/admin/login");
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -40,7 +48,10 @@ const LayoutAdmin = () => {
           background: "#000957", // ✅ Đổi màu header
         }}
       >
-        <div className="logo" style={{ display: "flex", flex: 1, alignItems: "center" }}>
+        <div
+          className="logo"
+          style={{ display: "flex", flex: 1, alignItems: "center" }}
+        >
           {/* Logo nếu có */}
         </div>
         <Menu
@@ -64,18 +75,23 @@ const LayoutAdmin = () => {
           <Menu.Item key="3">
             <NavLink to="/admin/product">Product</NavLink>
           </Menu.Item>
-          <Menu.Item key="5">
-            <NavLink to="/admin/login">Login</NavLink>
-          </Menu.Item>
-          <Menu.Item key="6">
-            <NavLink to="/admin/logout">Logout</NavLink>
-          </Menu.Item>
+          {!localStorage.getItem("token") ? (
+            <Menu.Item key="5">
+              <NavLink to="/admin/login">Login</NavLink>
+            </Menu.Item>
+          ) : (
+            <Menu.Item key="6" onClick={logout}>
+              Logout
+            </Menu.Item>
+          )}
         </Menu>
       </Header>
 
       <Layout>
         {/* Sidebar */}
-        <Sider style={{ background: "#000957" }}> {/* ✅ Đổi màu sidebar */}
+        <Sider style={{ background: "#000957" }}>
+          {" "}
+          {/* ✅ Đổi màu sidebar */}
           <Menu
             theme="dark"
             mode="inline"

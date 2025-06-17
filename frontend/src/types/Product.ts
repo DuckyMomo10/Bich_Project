@@ -3,12 +3,14 @@ export interface ProductType {
     name: string;
     price: number;
     material: string;
-    color: string;
-    size: string;
+    color: string[];
     images: string[];
-    favourites: boolean;
-    description?: string;
-    specification?: string;
+    description: string;
+    specification: string;
     category?: string;
     isAvailable?: boolean;
+    quantity: number;
+    relatedProducts?: ProductType[];
+    createdAt: string;
+    updatedAt: string;
 }

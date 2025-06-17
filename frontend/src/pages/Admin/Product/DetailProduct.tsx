@@ -1,72 +1,110 @@
 import { Card, Descriptions, Button, Row, Col, Typography, Space } from 'antd';
-import { Link } from 'react-router-dom'; // Chú ý: sử dụng 'react-router-dom' thay vì 'react-router'
+import { Link, useParams } from 'react-router-dom';
 import ProductImage from "../../../assets/product.jpg";
 import FormatCurrent from '../../../services/FormatCurrent';
+import axiosInstance from '../../../utils/axios';
+import { useQuery } from '@tanstack/react-query';
+import { ProductType } from '../../../types/Product';
 
 const { Title, Text } = Typography;
 
 const DetailProductAdmin = () => {
-  const product = {
-    id: 1,
-    name: 'Áo thun nam',
-    image: ProductImage,
-    price: 200000,
-    material: 'Cotton',
-    color: 'Đỏ',
-    size: 'L',
+  const { id } = useParams();
+
+  const getProductById = async () => {
+    const { data } = await axiosInstance.get(`/products/product/${id}`);
+    return data;
   };
 
+  const { data: product, isLoading, isError, error } = useQuery<ProductType>({
+    queryKey: ['productDetail', id],
+    queryFn: getProductById,
+    enabled: !!id,
+  });
+
+  if (isLoading) return <p>Loading product details...</p>;
+  if (isError) return <p>Error loading product details: {error?.message}</p>;
+  if (!product) return <p>Product not found.</p>;
+
   return (
-    <div style={{ padding: 20, backgroundColor: '#f5f5f5' }}>
+    <div style={{ padding: '32px 16px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       <Card
         title={<Title level={3} style={{ marginBottom: 0 }}>Chi tiết sản phẩm</Title>}
         style={{
           width: '100%',
-          maxWidth: 900,
+          maxWidth: 960,
           margin: '0 auto',
           borderRadius: 12,
-          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)',
         }}
+        bodyStyle={{ padding: 24 }}
       >
-        
-        <Row gutter={[32, 32]}>
-          <Col span={10}>
+        <Row gutter={[24, 24]}>
+          <Col xs={24} sm={24} md={12} lg={12}>
             <img
               alt="product"
-              src={product.image}
+              src={product.images && product.images.length > 0 ? product.images[0] : ProductImage}
               style={{
                 width: '100%',
-                height: 'auto',
-                borderRadius: 12,
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                borderRadius: 10,
+                objectFit: 'cover',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
               }}
-              
             />
           </Col>
-          <Col span={14}>
+
+          <Col xs={24} sm={24} md={12} lg={12}>
             <Descriptions
-              title="Thông tin sản phẩm"
               bordered
+              size="small"
               column={1}
-              size="middle"
-              labelStyle={{ width: 200 }}
+              labelStyle={{
+                background: '#fafafa',
+                fontWeight: 600,
+                width: 100,
+                fontSize: 13,
+              }}
+              contentStyle={{
+                fontSize: 13,
+              }}
             >
-              <Descriptions.Item label="Tên sản phẩm">
-                <Text strong>{product.name}</Text>
-              </Descriptions.Item>
+              <Descriptions.Item label="Tên">{product.name}</Descriptions.Item>
               <Descriptions.Item label="Giá">
-                <Text type="danger" strong>
-                  <FormatCurrent price={product.price} />
-                </Text>
+                <Text type="danger"><FormatCurrent price={product.price} /></Text>
               </Descriptions.Item>
               <Descriptions.Item label="Chất liệu">{product.material}</Descriptions.Item>
-              <Descriptions.Item label="Màu sắc">{product.color}</Descriptions.Item>
-              <Descriptions.Item label="Kích thước">{product.size}</Descriptions.Item>
+              <Descriptions.Item label="Màu sắc">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {product.color && product.color.map((colorItem, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        backgroundColor: colorItem,
+                        border: '1px solid #d9d9d9',
+                        borderRadius: '4px',
+                      }}
+                      title={colorItem}
+                    />
+                  ))}
+                </div>
+              </Descriptions.Item>
+              <Descriptions.Item label="Tình trạng">
+                <Text type={product.isAvailable ? "success" : "danger"}>
+                  {product.isAvailable ? 'Còn hàng' : 'Hết hàng'}
+                </Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="Danh mục">{product.category}</Descriptions.Item>
+              <Descriptions.Item label="Kỹ thuật" span={2}>{product.specification}</Descriptions.Item>
+              <Descriptions.Item label="Mô tả" span={2}>{product.description}</Descriptions.Item>
+              <Descriptions.Item label="Cập nhật">{new Date(product.updatedAt).toLocaleDateString()}</Descriptions.Item>
+              <Descriptions.Item label="Tạo">{new Date(product.createdAt).toLocaleDateString()}</Descriptions.Item>
             </Descriptions>
 
             <Space style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
-              <Link to={`/admin/edit-product/${product.id}`}>
-                <Button type="primary" size="large" style={{ borderRadius: 8 }}>
+              <Link to={`/admin/edit-product/${product._id}`}>
+                <Button type="primary" size="middle" style={{ borderRadius: 6 }}>
                   Chỉnh sửa
                 </Button>
               </Link>

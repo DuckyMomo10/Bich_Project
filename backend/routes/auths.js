@@ -12,13 +12,13 @@ import { protect } from '../middlewares/authMiddleware.js'
 const router = express.Router()
 
 // Public routes
-router.post('/register', register)
-router.post('/login', login)
-router.post('/forgot-password', forgotPassword)
-router.post('/reset-password', resetPassword)
+router.post('/register', express.json(), register)
+router.post('/login', express.json(), login)
+router.post('/forgot-password', express.json(), forgotPassword)
+router.post('/reset-password', express.json(), resetPassword)
 
 // Protected routes
 router.get('/profile', protect, getUserProfile)
-router.put('/profile', protect, updateUserProfile)
+router.put('/profile', protect, express.json(), updateUserProfile)
 
 export default router

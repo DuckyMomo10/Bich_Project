@@ -4,7 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auths.js";
-import productRouter from "./routes/products.js";
+import productRouter from "./routes/productRoutes.js";
 import userRouter from "./routes/users.js";
 import path from 'path';
 import { fileURLToPath } from 'url';

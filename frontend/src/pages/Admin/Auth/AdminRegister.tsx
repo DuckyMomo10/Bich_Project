@@ -1,4 +1,3 @@
-import React from "react";
 import { Form, Input, Button, Card, message, Row, Col, Typography } from "antd";
 const { Title } = Typography;
 import { useNavigate } from "react-router-dom";

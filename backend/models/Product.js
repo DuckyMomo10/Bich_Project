@@ -11,6 +11,10 @@ const productSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
+  material: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
@@ -20,13 +24,20 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   color: {
-    type: String,
+    type: [String],
     required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 0,
+    validate: {
+      validator: function(v) {
+        // Check if array is not empty
+        if (!Array.isArray(v) || v.length === 0) {
+          return false;
+        }
+        // Validate each color is a valid HEX code
+        const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+        return v.every(color => hexColorRegex.test(color));
+      },
+      message: 'Colors must be valid HEX codes (e.g., #FF0000) and at least one color must be specified'
+    }
   },
   images: {
     type: [String], // Mảng ảnh sản phẩm
