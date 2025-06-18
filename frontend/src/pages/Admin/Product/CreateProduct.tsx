@@ -237,7 +237,8 @@ const CreateProduct: React.FC = () => {
               { required: true, message: "Vui lòng nhập thông số kỹ thuật!" },
             ]}
           >
-            <Input.TextArea placeholder="Nhập thông số kỹ thuật (ví dụ: CPU, RAM, màn hình, kích cỡ)" />
+            <Input.TextArea placeholder="Nhập thông số kỹ thuật sản phẩm 
+            " />
           </Form.Item>
 
           <Form.Item

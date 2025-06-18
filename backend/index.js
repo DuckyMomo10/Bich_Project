@@ -6,8 +6,8 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auths.js";
 import productRouter from "./routes/productRoutes.js";
 import userRouter from "./routes/users.js";
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -44,14 +44,15 @@ app.use(cors(corsOptions)); // Đảm bảo corsOptions được áp dụng
 // Thêm Content-Security-Policy Header
 app.use((req, res, next) => {
   res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self'; img-src 'self' data: http://localhost:8000;"
-  ); // Cho phép ảnh từ 'self' và localhost:8000
+    "Content-Security-Policy",
+    `default-src 'self'; img-src 'self' data: ${process.env.SERVER_URL};`
+  );
+  // Cho phép ảnh từ 'self' và localhost:8000
   next();
 });
 
-const staticPath = path.join(__dirname, 'uploads');
-console.log('Express static serving from:', staticPath);
+const staticPath = path.join(__dirname, "uploads");
+console.log("Express static serving from:", staticPath);
 app.use("/api/uploads", express.static(staticPath));
 
 app.get("/", (req, res) => {
@@ -59,9 +60,9 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-app.use('/api/auth', authRouter);
-app.use('/api/products', productRouter);
-app.use('/api/users', userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/products", productRouter);
+app.use("/api/users", userRouter);
 
 // Error handling middleware
 app.use((error, req, res, next) => {
@@ -73,4 +74,4 @@ connect().then(() => {
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
-}); 
+});

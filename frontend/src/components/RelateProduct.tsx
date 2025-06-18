@@ -22,10 +22,10 @@ const RelateProduct = ({ product }: { product: ExtendedProduct }) => {
           <div
             style={{ position: "relative", overflow: "hidden", height: 200 }}
           >
-            <Link to={`/product/${product.id}`}>
+            <Link to={`/product/${product._id}`}>
               <img
                 alt="Product"
-                src={product.image || imgProduct}
+                src={product.images[0] || imgProduct}
                 className="transition-transform duration-300 hover:scale-105"
                 style={{ width: "100%", height: 200, objectFit: "cover" }}
               />

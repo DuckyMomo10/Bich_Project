@@ -26,10 +26,10 @@ export const FavouriteProvider = ({
   const toggleFavourite = (product: ProductType) => {
     setFavourites((prev) => {
       // Kiểm tra xem sản phẩm đã có trong danh sách yêu thích chưa
-      const exist = prev.find((item) => item.id === product.id);
+      const exist = prev.find((item) => item._id === product._id);
       if (exist) {
         // Nếu sản phẩm đã có, xóa sản phẩm khỏi danh sách yêu thích
-        return prev.filter((item) => item.id !== product.id);
+        return prev.filter((item) => item._id !== product._id);
       } else {
         // Nếu sản phẩm chưa có, thêm sản phẩm vào danh sách yêu thích
         return [...prev, product];
@@ -39,7 +39,7 @@ export const FavouriteProvider = ({
 
   // Hàm kiểm tra sản phẩm có nằm trong danh sách yêu thích không
   const isFavourite = (productId: string | number) => {
-    return favourites.some((item) => item.id === productId); // Kiểm tra dựa trên id của sản phẩm
+    return favourites.some((item) => item._id === productId); // Kiểm tra dựa trên id của sản phẩm
   };
 
   return (
